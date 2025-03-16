@@ -1,10 +1,13 @@
-
 // API key configuration
 const API_KEY = 'AIzaSyDWqzhnCgvlywxnkAczALKwo6G0NdDfQEc';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
+// Log initialization
+console.log('ChatGPT Prompt Enhancer: Background script initialized');
+
 // Create context menu item when extension is installed
 chrome.runtime.onInstalled.addListener(() => {
+    console.log('ChatGPT Prompt Enhancer: Extension installed');
     chrome.contextMenus.create({
         id: "polishPrompt",
         title: "Polish My Prompt",
@@ -15,13 +18,15 @@ chrome.runtime.onInstalled.addListener(() => {
 // Handle context menu click
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === "polishPrompt") {
-        // Show processing notification
-        await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            function: showNotification
-        });
-
+        console.log('ChatGPT Prompt Enhancer: Context menu clicked');
+        
         try {
+            // Show processing notification
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                function: showNotification
+            });
+
             // Get improved prompt from Gemini API
             const improvedPrompt = await improvePromptWithGemini("Improve this prompt:", info.selectionText);
             
@@ -32,22 +37,29 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 args: [improvedPrompt]
             });
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error in context menu handler:', error);
             // Show error notification
-            await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                function: updateNotificationAndCopy,
-                args: ['Error improving prompt. Please try again.']
-            });
+            try {
+                await chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    function: updateNotificationAndCopy,
+                    args: ['Error improving prompt. Please try again.']
+                });
+            } catch (innerError) {
+                console.error('Failed to show error notification:', innerError);
+            }
         }
     }
 });
 
 // Listen for messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('ChatGPT Prompt Enhancer: Message received:', request.action);
+    
     if (request.action === "enhancePrompt") {
         improvePromptWithGemini(request.promptType, request.text)
             .then(enhancedPrompt => {
+                console.log('ChatGPT Prompt Enhancer: Prompt enhanced successfully');
                 sendResponse({success: true, enhancedPrompt});
             })
             .catch(error => {
@@ -60,6 +72,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Function to improve prompt using Gemini API
 async function improvePromptWithGemini(promptType, prompt) {
+    console.log('ChatGPT Prompt Enhancer: Calling Gemini API');
+    
     try {
         const response = await fetch(`${GEMINI_API_URL}?key=${API_KEY}`, {
             method: 'POST',
@@ -74,7 +88,10 @@ async function improvePromptWithGemini(promptType, prompt) {
 Input: "${prompt}"
 
 Rules:
-
+1. Improve the prompt structure and clarity
+2. Enhance specificity and precision
+3. Add necessary context if missing
+4. Make the language more effective
 5. Never ask questions
 6. Never provide solutions
 
@@ -129,7 +146,12 @@ function showNotification() {
 // Function to update notification and copy text (injected into page)
 function updateNotificationAndCopy(text) {
     const notification = document.getElementById('translate-notification');
-    if (!notification) return;
+    if (!notification) {
+        // Create notification if it doesn't exist
+        showNotification();
+        setTimeout(() => updateNotificationAndCopy(text), 100);
+        return;
+    }
 
     notification.textContent = 'Polished Prompt copied to clipboard!';
     

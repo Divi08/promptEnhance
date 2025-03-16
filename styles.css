@@ -1,56 +1,42 @@
-
-.prompt-enhance-buttons {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  justify-content: center;
+/* More specific selectors to avoid conflicts */
+#enhance-prompt-btn {
+    position: absolute !important;
+    right: 50px !important;
+    bottom: 12px !important;
+    padding: 6px 12px !important;
+    background: none !important;
+    border: 1px solid #8e8ea0 !important;
+    border-radius: 4px !important;
+    color: #8e8ea0 !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    z-index: 10000 !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
 }
 
-.prompt-enhance-buttons button {
-  padding: 6px 12px;
-  border: 1px solid #10a37f;
-  border-radius: 4px;
-  background: #ffffff;
-  color: #10a37f;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  font-size: 14px;
+#enhance-prompt-btn:hover {
+    background-color: #8e8ea0 !important;
+    color: white !important;
 }
 
-.prompt-enhance-buttons button:hover {
-  background: #f0faf7;
-  transform: translateY(-1px);
+.enhance-prompt-btn-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
 }
 
-.prompt-enhance-buttons button:active {
-  transform: translateY(0px);
+#prompt-enhance-notification {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    background-color: #19c37d !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 5px !important;
+    z-index: 10001 !important;
+    transition: opacity 0.3s !important;
 }
 
-.prompt-enhance-notification {
-  position: fixed;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  z-index: 9999;
-  opacity: 1;
-  transition: opacity 0.5s ease-out;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .prompt-enhance-buttons button {
-    background: #343541;
-    color: #10a37f;
-    border-color: #444654;
-  }
-
-  .prompt-enhance-buttons button:hover {
-    background: #40414f;
-  }
-}
