@@ -1,0 +1,29 @@
+
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Prompt Enhancer",
+  "version": "1.0",
+  "description": "Enhance your ChatGPT prompts with additional features",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus",
+    "scripting",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {},
+  "content_scripts": [
+    {
+      "matches": ["https://chat.openai.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}

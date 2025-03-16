@@ -1,0 +1,56 @@
+
+.prompt-enhance-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  justify-content: center;
+}
+
+.prompt-enhance-buttons button {
+  padding: 6px 12px;
+  border: 1px solid #10a37f;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #10a37f;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.prompt-enhance-buttons button:hover {
+  background: #f0faf7;
+  transform: translateY(-1px);
+}
+
+.prompt-enhance-buttons button:active {
+  transform: translateY(0px);
+}
+
+.prompt-enhance-notification {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .prompt-enhance-buttons button {
+    background: #343541;
+    color: #10a37f;
+    border-color: #444654;
+  }
+
+  .prompt-enhance-buttons button:hover {
+    background: #40414f;
+  }
+}
