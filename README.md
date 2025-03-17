@@ -136,4 +136,3 @@ This extension:
 
 ---
 
-Made with ❤️ by [Your Name]
