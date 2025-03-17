@@ -19,7 +19,7 @@ function debounce(func, wait) {
     };
 }
 
-// Create a draggable floating bubble with options - runs immediately
+// Create a floating bubble with options - runs immediately
 (function() {
     if (!isValidChatGPTPage()) {
         console.log("ChatGPT Prompt Enhancer: Not a valid ChatGPT page");
@@ -28,70 +28,71 @@ function debounce(func, wait) {
 
     console.log("ChatGPT Prompt Enhancer: Starting content script");
     
-    let initialized = false;
-    const maxInitAttempts = 10;
-    let initializeAttempt = 0;
-
-    // Debounced textarea finder
-    const debouncedFindTextArea = debounce(() => {
-        const textarea = findTextArea();
-        if (textarea && !document.getElementById('enhance-prompt-btn')) {
-            createEnhanceButton();
-        }
-    }, 250);
-
-    function attemptInitialization() {
-        if (initialized) return;
+    // Create the floating bubble if it doesn't exist
+    if (!document.getElementById('prompt-enhance-bubble')) {
+        const bubble = document.createElement('div');
+        bubble.id = 'prompt-enhance-bubble';
+        bubble.innerHTML = '<span>+</span>';
+        document.body.appendChild(bubble);
         
-        initializeAttempt++;
-        console.log(`ChatGPT Prompt Enhancer: Initialization attempt ${initializeAttempt}`);
-
-        const mainContent = document.querySelector('main') || document.querySelector('.chat');
-        if (!mainContent) {
-            if (initializeAttempt < maxInitAttempts) {
-                setTimeout(attemptInitialization, 1000);
+        // Create options container
+        const options = document.createElement('div');
+        options.id = 'prompt-enhance-options';
+        document.body.appendChild(options);
+        
+        // Create three buttons
+        const buttons = [
+            { id: 'enhance-button', text: 'Enhance Prompt', icon: '✨' },
+            { id: 'formal-button', text: 'Make Formal', icon: '📝' },
+            { id: 'clarify-button', text: 'Clarify Intent', icon: '🔍' }
+        ];
+        
+        buttons.forEach(btn => {
+            const button = document.createElement('button');
+            button.id = btn.id;
+            button.innerHTML = `${btn.icon} ${btn.text}`;
+            button.style.cssText = `
+                padding: 8px 16px;
+                border: none;
+                background: #f0f0f0;
+                border-radius: 4px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                transition: background 0.2s;
+                white-space: nowrap;
+            `;
+            
+            button.addEventListener('mouseover', () => {
+                button.style.background = '#e0e0e0';
+            });
+            
+            button.addEventListener('mouseout', () => {
+                button.style.background = '#f0f0f0';
+            });
+            
+            button.addEventListener('click', () => {
+                handleButtonClick(btn.id);
+            });
+            
+            options.appendChild(button);
+        });
+        
+        // Toggle options on bubble click
+        bubble.addEventListener('click', () => {
+            options.style.display = options.style.display === 'none' ? 'flex' : 'none';
+        });
+        
+        // Hide options when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!bubble.contains(e.target) && !options.contains(e.target)) {
+                options.style.display = 'none';
             }
-            return;
-        }
-
-        if (!document.getElementById('prompt-enhance-bubble')) {
-            createFloatingBubble();
-        }
-
-        const textarea = findTextArea();
-        if (textarea) {
-            createEnhanceButton();
-            initialized = true;
-        } else if (initializeAttempt < maxInitAttempts) {
-            setTimeout(attemptInitialization, 1000);
-        }
+        });
     }
-
-    // Start initialization
-    attemptInitialization();
-
-    // Modified mutation observer
-    const observer = new MutationObserver((mutations) => {
-        let shouldCheck = false;
-        for (const mutation of mutations) {
-            if (mutation.addedNodes.length || 
-                (mutation.type === 'attributes' && mutation.target.tagName === 'TEXTAREA')) {
-                shouldCheck = true;
-                break;
-            }
-        }
-        if (shouldCheck) {
-            debouncedFindTextArea();
-        }
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'style']
-    });
-})();
+})(); // End of floating bubble creation
 
 function createFloatingBubble() {
     // Check if bubble already exists
@@ -109,11 +110,44 @@ function createFloatingBubble() {
     bubble.innerHTML = '<span>+</span>';
     bubble.title = 'Prompt Enhancer';
     
-    // Create options container (initially hidden)
+    // Style the bubble
+    bubble.style.cssText = `
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        width: 40px;
+        height: 40px;
+        background: #19c37d;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        font-size: 24px;
+        z-index: 10000;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    `;
+    
+    // Create options container
     const options = document.createElement('div');
     options.id = 'prompt-enhance-options';
     options.className = 'prompt-enhance-options';
-    options.style.display = 'none';
+    options.style.cssText = `
+        position: fixed;
+        right: 70px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: white;
+        border-radius: 8px;
+        padding: 10px;
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 9999;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border: 1px solid #e0e0e0;
+    `;
     
     // Create three buttons
     const buttons = [
@@ -126,10 +160,32 @@ function createFloatingBubble() {
         const button = document.createElement('button');
         button.id = btn.id;
         button.innerHTML = `${btn.icon} ${btn.text}`;
+        button.style.cssText = `
+            padding: 8px 16px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        `;
+        
+        button.addEventListener('mouseover', () => {
+            button.style.background = '#e0e0e0';
+        });
+        
+        button.addEventListener('mouseout', () => {
+            button.style.background = '#f0f0f0';
+        });
         
         // Add click event for each button
         button.addEventListener('click', () => {
             handleButtonClick(btn.id);
+            options.style.display = 'none'; // Hide options after clicking
         });
         
         options.appendChild(button);
@@ -143,13 +199,10 @@ function createFloatingBubble() {
     
     // Toggle options when bubble is clicked
     bubble.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent body click from immediately closing it
+        e.stopPropagation();
         const isVisible = options.style.display === 'flex';
         options.style.display = isVisible ? 'none' : 'flex';
     });
-    
-    // Make bubble draggable
-    makeDraggable(bubble);
     
     // Close options when clicking outside
     document.addEventListener('click', (e) => {
@@ -158,56 +211,84 @@ function createFloatingBubble() {
         }
     });
     
+    // Make bubble draggable
+    makeDraggable(bubble, options);
+    
     // Restore position if saved
     restoreBubblePosition();
 }
 
 // Make an element draggable
-function makeDraggable(element) {
+function makeDraggable(bubble, options) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     
-    element.onmousedown = dragMouseDown;
+    bubble.onmousedown = dragMouseDown;
     
     function dragMouseDown(e) {
         e.preventDefault();
         e.stopPropagation();
-        // Get the mouse cursor position at startup
+        
+        // Get the current mouse position
         pos3 = e.clientX;
         pos4 = e.clientY;
+        
+        // Add a class while dragging
+        bubble.classList.add('dragging');
+        
         document.onmouseup = closeDragElement;
-        // Call a function whenever the cursor moves
         document.onmousemove = elementDrag;
     }
     
     function elementDrag(e) {
         e.preventDefault();
-        // Calculate the new cursor position
+        
+        // Calculate the new position
         pos1 = pos3 - e.clientX;
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
-        // Set the element's new position
-        element.style.top = (element.offsetTop - pos2) + "px";
-        element.style.left = (element.offsetLeft - pos1) + "px";
-        element.style.right = "auto"; // Override default right position
         
-        // Update options position based on bubble position
-        const options = document.getElementById('prompt-enhance-options');
+        // Update bubble position while maintaining its dimensions
+        const newTop = (bubble.offsetTop - pos2);
+        const newLeft = (bubble.offsetLeft - pos1);
+        
+        bubble.style.cssText = `
+            position: fixed !important;
+            top: ${newTop}px !important;
+            left: ${newLeft}px !important;
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            max-width: 40px !important;
+            background: #19c37d !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            cursor: pointer !important;
+            font-size: 24px !important;
+            z-index: 10000 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+        `;
+        
+        // Update options position if they exist
         if (options) {
-            options.style.top = element.style.top;
-            options.style.left = (parseInt(element.style.left || 0) - options.offsetWidth - 10) + "px";
-            options.style.right = "auto";
-            options.style.transform = "none";
+            options.style.top = `${newTop}px`;
+            options.style.left = `${newLeft - options.offsetWidth - 10}px`;
         }
     }
     
     function closeDragElement() {
+        // Remove the dragging class
+        bubble.classList.remove('dragging');
+        
         // Stop moving when mouse button is released
         document.onmouseup = null;
         document.onmousemove = null;
         
-        // Save position in localStorage for persistence
-        const rect = element.getBoundingClientRect();
+        // Save position
+        const rect = bubble.getBoundingClientRect();
         localStorage.setItem('promptEnhanceBubblePosition', JSON.stringify({
             top: rect.top,
             left: rect.left
@@ -295,21 +376,43 @@ async function handleButtonClick(buttonId) {
             ? "Make this prompt more formal and professional:" 
             : "Improve this prompt:";
 
-        const response = await chrome.runtime.sendMessage({
-            action: "enhancePrompt",
-            promptType,
-            text: text.trim()
+        // Check if chrome.runtime is available
+        if (!chrome || !chrome.runtime || !chrome.runtime.sendMessage) {
+            throw new Error('Extension context invalid');
+        }
+
+        // Wrap the sendMessage in a Promise
+        const response = await new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({
+                action: "enhancePrompt",
+                promptType,
+                text: text.trim()
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(response);
+                }
+            });
         });
 
         if (response?.success) {
             updateReactTextarea(textarea, response.enhancedPrompt);
             showNotification('Prompt enhanced successfully!');
         } else {
-            throw new Error('Enhancement failed');
+            throw new Error(response?.error || 'Enhancement failed');
         }
     } catch (error) {
         console.error('Enhancement error:', error);
         showNotification('Failed to enhance prompt. Please try again.');
+        
+        // Attempt to reconnect to extension context
+        if (error.message.includes('Extension context invalid')) {
+            console.log('ChatGPT Prompt Enhancer: Attempting to reconnect...');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
     }
 }
 
@@ -358,30 +461,40 @@ function createEnhanceButton() {
         </div>
     `;
 
-    // Use inline styles to avoid CSP issues
+    // Updated inline styles
     button.style.cssText = `
         position: absolute;
-        right: 50px;
+        right: 65px;
         bottom: 12px;
-        padding: 6px 12px;
+        padding: 6px 16px;
         background: none;
         border: 1px solid #8e8ea0;
-        border-radius: 4px;
+        border-radius: 6px;
         color: #8e8ea0;
         cursor: pointer;
         font-size: 14px;
         z-index: 10;
         transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 100px;
+        justify-content: center;
+        font-weight: 500;
+        height: 32px;
+        line-height: 1;
     `;
 
     button.addEventListener('mouseenter', () => {
         button.style.backgroundColor = '#8e8ea0';
         button.style.color = 'white';
+        button.style.borderColor = '#8e8ea0';
     });
 
     button.addEventListener('mouseleave', () => {
         button.style.backgroundColor = 'transparent';
         button.style.color = '#8e8ea0';
+        button.style.borderColor = '#8e8ea0';
     });
 
     button.addEventListener('click', async (e) => {
@@ -482,10 +595,15 @@ function findTextArea() {
     return null;
 }
 
-// Modified initialization to handle React components better
+// Modified initialization to handle both the floating bubble and enhance button
 function initializeEnhancer() {
-    if (!isValidChatGPTPage()) return;
+    if (!isValidChatGPTPage()) {
+        console.log("ChatGPT Prompt Enhancer: Not a valid ChatGPT page");
+        return;
+    }
 
+    console.log("ChatGPT Prompt Enhancer: Starting initialization");
+    
     let initialized = false;
     const maxAttempts = 10;
     let attempts = 0;
@@ -494,32 +612,66 @@ function initializeEnhancer() {
         if (initialized || attempts >= maxAttempts) return;
         attempts++;
 
+        console.log(`ChatGPT Prompt Enhancer: Initialization attempt ${attempts}`);
+
+        // First, create the floating bubble if it doesn't exist
+        if (!document.getElementById('prompt-enhance-bubble')) {
+            createFloatingBubble();
+            console.log("ChatGPT Prompt Enhancer: Created floating bubble");
+        }
+
+        // Then, handle the enhance button in the textarea
         const textarea = findTextArea();
-        if (textarea) {
-            if (!document.getElementById('prompt-enhance-bubble')) {
-                createFloatingBubble();
-            }
-            if (!document.getElementById('enhance-prompt-btn')) {
-                createEnhanceButton();
-            }
+        if (textarea && !document.getElementById('enhance-prompt-btn')) {
+            createEnhanceButton();
+            console.log("ChatGPT Prompt Enhancer: Created enhance button");
             initialized = true;
         } else {
             setTimeout(init, 1000);
         }
     }
 
+    // Start initialization
     init();
 
-    // Observe DOM changes for dynamic content
+    // Observe DOM changes
     const observer = new MutationObserver(debounce(() => {
-        if (!initialized) init();
+        const bubble = document.getElementById('prompt-enhance-bubble');
+        const enhanceBtn = document.getElementById('enhance-prompt-btn');
+        
+        if (!bubble) {
+            createFloatingBubble();
+        }
+        
+        if (!enhanceBtn) {
+            const textarea = findTextArea();
+            if (textarea) {
+                createEnhanceButton();
+            }
+        }
     }, 250));
 
     observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
     });
 }
 
 // Start the initialization
 initializeEnhancer();
+
+// Add a helper function to check extension connection
+function checkExtensionConnection() {
+    return new Promise((resolve) => {
+        if (!chrome || !chrome.runtime || !chrome.runtime.sendMessage) {
+            resolve(false);
+            return;
+        }
+
+        chrome.runtime.sendMessage({ action: "ping" }, (response) => {
+            resolve(!chrome.runtime.lastError && response === "pong");
+        });
+    });
+}

@@ -1,12 +1,12 @@
-/* More specific selectors to avoid conflicts */
+/* Enhance button styles */
 #enhance-prompt-btn {
     position: absolute !important;
-    right: 50px !important;
+    right: 65px !important;
     bottom: 12px !important;
-    padding: 6px 12px !important;
+    padding: 6px 16px !important;
     background: none !important;
     border: 1px solid #8e8ea0 !important;
-    border-radius: 4px !important;
+    border-radius: 6px !important;
     color: #8e8ea0 !important;
     cursor: pointer !important;
     font-size: 14px !important;
@@ -14,20 +14,139 @@
     transition: all 0.2s ease !important;
     display: flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 8px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    min-width: 100px !important;
+    justify-content: center !important;
+    font-weight: 500 !important;
+    height: 32px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+#enhance-prompt-btn .enhance-prompt-btn-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
 }
 
 #enhance-prompt-btn:hover {
     background-color: #8e8ea0 !important;
     color: white !important;
+    border-color: #8e8ea0 !important;
 }
 
-.enhance-prompt-btn-content {
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    #enhance-prompt-btn {
+        border-color: #565869 !important;
+        color: #565869 !important;
+    }
+
+    #enhance-prompt-btn:hover {
+        background-color: #565869 !important;
+        color: white !important;
+        border-color: #565869 !important;
+    }
+}
+
+/* Floating bubble styles */
+#prompt-enhance-bubble {
+    position: fixed !important;
+    right: 20px !important;
+    top: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    background: #19c37d !important;
+    border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    justify-content: center !important;
+    color: white !important;
+    cursor: pointer !important;
+    font-size: 24px !important;
+    z-index: 10000 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+    transform: translateY(-50%) !important;
+    user-select: none !important;
 }
 
+#prompt-enhance-bubble:hover {
+    transform: translateY(-50%) scale(1.05) !important;
+    transition: transform 0.2s ease !important;
+}
+
+/* Options menu styles */
+#prompt-enhance-options {
+    position: fixed !important;
+    right: 70px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: none;
+    flex-direction: column !important;
+    gap: 8px !important;
+    background: white !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    z-index: 10000 !important;
+    width: 180px !important; /* Fixed width */
+}
+
+#prompt-enhance-options button {
+    width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding: 8px 16px !important;
+    margin: 4px 0 !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 4px !important;
+    background: #f7f7f8 !important;
+    color: #374151 !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    #prompt-enhance-options {
+        background: #2d2d2d !important;
+        border-color: #404040 !important;
+    }
+
+    #prompt-enhance-options button {
+        background: #3a3a3a !important;
+        color: #ffffff !important;
+        border-color: #404040 !important;
+    }
+
+    #enhance-prompt-btn {
+        border-color: #19c37d !important;
+        color: #19c37d !important;
+    }
+}
+
+/* Hover states */
+#enhance-prompt-btn:hover,
+#prompt-enhance-options button:hover {
+    background: #19c37d !important;
+    color: white !important;
+    border-color: #19c37d !important;
+}
+
+#prompt-enhance-bubble:hover {
+    transform: translateY(-50%) scale(1.05) !important;
+}
+
+/* Notification styles */
 #prompt-enhance-notification {
     position: fixed !important;
     bottom: 20px !important;
@@ -38,5 +157,67 @@
     border-radius: 5px !important;
     z-index: 10001 !important;
     transition: opacity 0.3s !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Add styles for the bubble and options */
+#prompt-enhance-bubble {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    transition: transform 0.2s ease !important;
+}
+
+#prompt-enhance-bubble:hover {
+    transform: translateY(-50%) scale(1.05) !important;
+}
+
+#prompt-enhance-options {
+    background: #ffffff !important;
+    border: 1px solid #e5e5e5 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+#prompt-enhance-options button {
+    background: #f7f7f8 !important;
+    color: #374151 !important;
+    border: 1px solid #e5e5e5 !important;
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    text-align: left !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+#prompt-enhance-options button:hover {
+    background: #19c37d !important;
+    color: white !important;
+    border-color: #19c37d !important;
+}
+
+#prompt-enhance-options button:active {
+    transform: scale(0.98) !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    #prompt-enhance-options {
+        background: #2d2d2d !important;
+        border-color: #404040 !important;
+    }
+
+    #prompt-enhance-options button {
+        background: #3a3a3a !important;
+        color: #ffffff !important;
+        border-color: #404040 !important;
+    }
+
+    #prompt-enhance-options button:hover {
+        background: #19c37d !important;
+        border-color: #19c37d !important;
+    }
 }
 
